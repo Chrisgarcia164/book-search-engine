@@ -6,8 +6,8 @@ const resolvers = {
   Query: {
     me: async (parent, args, context) => {
       if (context.user) {
-        const userData = User.findOne({ _id: context.user.id }).select(
-          "-password"
+        const userData = await User.findOne({ _id: context.user.id }).select(
+          "-__v -password"
         );
         return userData;
       }
@@ -21,7 +21,7 @@ const resolvers = {
       return { user, token };
     },
     login: async (parent, { email, password }, context) => {
-      const user = User.findOne({ email });
+      const user = await User.findOne({ email });
       if (!user) {
         throw new AuthenticationError("No user found");
       }
@@ -46,7 +46,7 @@ const resolvers = {
       if (context.user) {
         const updatedUser = await User.findOneAndUpdate(
           { _id: _id },
-          { $pull: { savedBooks: { bookId: savedBooks.bookId } } },
+          { $pull: { savedBooks: { bookId } } },
           { new: true, runValidators: true }
         );
         return { updatedUser };
